@@ -49,6 +49,8 @@ body{
   padding:inherit;opacity:0;visibility:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
   transition:opacity .9s var(--ease),visibility 0s linear .9s}
 .scene::-webkit-scrollbar{display:none}
+.scene{-webkit-mask-image:linear-gradient(to bottom,transparent calc(env(safe-area-inset-top) + 30px),#000 calc(env(safe-area-inset-top) + 54px));
+  mask-image:linear-gradient(to bottom,transparent calc(env(safe-area-inset-top) + 30px),#000 calc(env(safe-area-inset-top) + 54px))}
 .scene.on{opacity:1;visibility:visible;transition:opacity .9s var(--ease),visibility 0s}
 .scene .inner{max-width:30rem;width:100%;margin:auto auto 0}
 .scene.center{text-align:center}
@@ -114,7 +116,7 @@ p.t strong{font-weight:400;color:var(--ink)}
 .choice small{display:block;font:500 12px/1.4 var(--sans);color:var(--muted);margin-top:4px}
 .choice::before{content:"";position:absolute;left:20px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
   border:1.5px solid var(--muted);transition:all .35s var(--ease)}
-.choice[data-c=liebe]{--c:var(--rose)}.choice[data-c=zeit]{--c:var(--gold)}.choice[data-c=loslassen]{--c:var(--sky)}
+.choice[data-c=warten]{--c:var(--gold)}.choice[data-c=vergessen]{--c:var(--sky)}
 .choice:active{transform:scale(.985)}
 .choice.sel{border-color:var(--c);background:rgba(40,28,36,.85)}
 .choice.sel::before{border-color:var(--c);background:var(--c);box-shadow:0 0 14px var(--c)}
@@ -135,7 +137,7 @@ textarea::placeholder{color:var(--muted)}
 /* Ende */
 .end h2{margin-bottom:22px}
 .end .sig{font-style:italic;color:var(--ember);font-size:22px;margin-top:10px}
-.end[data-c=liebe] .sig{color:var(--rose)}.end[data-c=zeit] .sig{color:var(--gold)}.end[data-c=loslassen] .sig{color:var(--sky)}
+.end[data-c=warten] .sig{color:var(--gold)}.end[data-c=vergessen] .sig{color:var(--sky)}
 
 @media (min-width:720px){
   #stage{padding-left:0;padding-right:0}
@@ -253,19 +255,30 @@ textarea::placeholder{color:var(--muted)}
       <h2 class="line" style="--i:1">Ich weiss, dass du einen Freund hast.</h2>
       <p class="t line" style="--i:2">Ich will nichts kaputt machen und dich zu nichts drängen.</p>
       <p class="t line" style="--i:3">Aber seit Monaten weiss ich nicht, woran ich bin. Ich habe versucht, Abstand zu nehmen, und es nicht geschafft. <strong>Raten tut mir nicht mehr gut.</strong></p>
-      <p class="t line" style="--i:4">Darum frage ich dich. Einmal, ganz ehrlich.</p>
     </div>
   </section>
 
-  <!-- 7 Wahl -->
+  <!-- 7 Du -->
+  <section class="scene" data-orb="glow">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">VIII · Du</p>
+      <h2 class="line" style="--i:1">Was ich an dir so <em>liebe.</em></h2>
+      <p class="t line" style="--i:2">Dein Lächeln. Deine Art. Wie viel wir gemeinsam haben, oft mehr, als ich je gedacht hätte.</p>
+      <p class="t line" style="--i:3">Egal wie angespannt ich bin, du bringst mich wieder auf den Boden. Manchmal reicht ein Lächeln. Manchmal, dass ich dich streicheln darf.</p>
+      <p class="t line" style="--i:4">Und deine Reaktion, wenn ich deinen Arm, deine Schultern oder deinen Rücken küsse: <strong>Die kann ich nicht beschreiben.</strong></p>
+      <p class="t line" style="--i:5">Darum frage ich dich. Einmal, ganz ehrlich.</p>
+    </div>
+  </section>
+
+  <!-- 8 Frage -->
   <section class="scene" data-orb="ask" data-notap id="ask">
     <div class="inner">
-      <p class="chapter line" style="--i:0">VIII · Deine Antwort</p>
-      <h2 class="line" style="--i:1">Was empfindest du für mich?</h2>
-      <div class="choices line" style="--i:2" id="choices" role="radiogroup" aria-label="Deine Antwort">
-        <button class="choice" type="button" role="radio" aria-checked="false" data-c="liebe">Ich fühle auch etwas für dich.<small>Mehr als Freundschaft</small></button>
-        <button class="choice" type="button" role="radio" aria-checked="false" data-c="zeit">Ich bin unsicher.<small>Ich brauche Zeit</small></button>
-        <button class="choice" type="button" role="radio" aria-checked="false" data-c="loslassen">Ich mag dich, aber nicht so.<small>Bitte lass los</small></button>
+      <p class="chapter line" style="--i:0">IX · Deine Antwort</p>
+      <h2 class="line" style="--i:1">Lohnt es sich, auf dich zu <em>warten?</em></h2>
+      <p class="t line" style="--i:2">Oder soll ich versuchen, meine Gefühle für dich zu vergessen?</p>
+      <div class="choices line" style="--i:3" id="choices" role="radiogroup" aria-label="Deine Antwort">
+        <button class="choice" type="button" role="radio" aria-checked="false" data-c="warten">Ja, warte auf mich.<small>Es lohnt sich</small></button>
+        <button class="choice" type="button" role="radio" aria-checked="false" data-c="vergessen">Nein, vergiss deine Gefühle für mich.<small>Lass los</small></button>
       </div>
       <div class="note" id="note">
         <label class="small" for="msg">Wenn du magst, schreib noch etwas dazu. Musst du nicht.</label>
@@ -279,34 +292,25 @@ textarea::placeholder{color:var(--muted)}
     </div>
   </section>
 
-  <!-- 8 Enden -->
-  <section class="scene end" data-orb="bloom" data-notap data-end="liebe" data-c="liebe">
+  <!-- 9 Enden -->
+  <section class="scene end" data-orb="wait" data-notap data-end="warten" data-c="warten">
     <div class="inner">
-      <p class="chapter line" style="--i:0" >Danke</p>
-      <h2 class="line" style="--i:1">Wenn ich das lese, habe ich <em>Herzklopfen.</em></h2>
-      <p class="t line" style="--i:2">Danke, dass du es mir sagst. Ich weiss, dass es für dich nicht einfach ist, und ich will nichts überstürzen.</p>
-      <p class="t line" style="--i:3">Lass uns reden. In Ruhe, wenn es für dich passt.</p>
+      <p class="chapter line" style="--i:0">Danke</p>
+      <h2 class="line" style="--i:1">Dann <em>warte</em> ich.</h2>
+      <p class="t line" style="--i:2">Danke, dass du mir das sagst. Mehr brauche ich gerade nicht.</p>
+      <p class="t line" style="--i:3">Ich dränge dich nicht und ich zähle keine Tage. Ich bin da, so wie bisher, bis du so weit bist.</p>
       <p class="sig line" style="--i:4">Alexander</p>
     </div>
   </section>
 
-  <section class="scene end" data-orb="calm" data-notap data-end="zeit" data-c="zeit">
+  <section class="scene end" data-orb="release" data-notap data-end="vergessen" data-c="vergessen">
     <div class="inner">
       <p class="chapter line" style="--i:0">Danke</p>
-      <h2 class="line" style="--i:1">Nimm dir die Zeit, die du <em>brauchst.</em></h2>
-      <p class="t line" style="--i:2">Danke, dass du ehrlich bist, auch wenn die Antwort noch offen ist. Das ist mehr als nichts.</p>
-      <p class="t line" style="--i:3">Ich dränge dich nicht. Wenn du so weit bist, weisst du, wo du mich findest.</p>
-      <p class="sig line" style="--i:4">Alexander</p>
-    </div>
-  </section>
-
-  <section class="scene end" data-orb="release" data-notap data-end="loslassen" data-c="loslassen">
-    <div class="inner">
-      <p class="chapter line" style="--i:0">Danke</p>
-      <h2 class="line" style="--i:1">Ich lasse <em>los.</em></h2>
-      <p class="t line" style="--i:2">Danke, dass du ehrlich bist. Das ist mehr wert als jede Antwort, die ich mir gewünscht hätte.</p>
-      <p class="t line" style="--i:3">Ich lasse die Hoffnung gehen, nicht dich als Mensch. Und eins nehme ich mit: <strong>Du hast mir gezeigt, dass ich lieben kann.</strong></p>
-      <p class="sig line" style="--i:4">Alexander</p>
+      <h2 class="line" style="--i:1">Okay. Ich lasse <em>los.</em></h2>
+      <p class="t line" style="--i:2">Danke, dass du ehrlich bist. Es tut weh, aber es ist besser, als weiter zu raten.</p>
+      <p class="t line" style="--i:3">Diese Gefühle werde ich nicht von heute auf morgen vergessen können. Das braucht Zeit.</p>
+      <p class="t line" style="--i:4">Ich wünsche mir, dass wir die restliche Zeit trotzdem ganz normal miteinander umgehen können. <strong>Das Zusammensein mit dir werde ich vermissen.</strong></p>
+      <p class="sig line" style="--i:5">Alexander</p>
     </div>
   </section>
 
@@ -357,11 +361,11 @@ textarea::placeholder{color:var(--muted)}
     twin:   { x:.44,y:.22, r:.14, a:.85, flick:.10, hue:[255,179,122], twin:1, rise:0 },
     steady: { x:.5, y:.20, r:.12, a:.70, flick:.05, hue:[255,186,140], twin:0, rise:0 },
     ask:    { x:.5, y:.10, r:.08, a:.50, flick:.05, hue:[255,186,140], twin:0, rise:0 },
-    bloom:  { x:.5, y:.24, r:.42, a:1.0, flick:.04, hue:[247,160,160], twin:0, rise:0 },
-    calm:   { x:.5, y:.24, r:.17, a:.80, flick:0,   hue:[236,201,140], twin:0, rise:0 },
-    release:{ x:.5, y:.24, r:.10, a:.80, flick:0,   hue:[169,192,222], twin:0, rise:1 }
+    glow:   { x:.5, y:.09, r:.13, a:.95, flick:.03, hue:[255,180,150], twin:0, rise:0 },
+    wait:   { x:.5, y:.22, r:.26, a:.95, flick:.02, hue:[240,196,130], twin:0, rise:0 },
+    release:{ x:.5, y:.22, r:.09, a:.70, flick:.08, hue:[150,172,205], twin:0, rise:1, flies:.25 }
   };
-  const cur = { ...ORB.intro, hue:[...ORB.intro.hue] };
+  const cur = { ...ORB.intro, hue:[...ORB.intro.hue], flies:1 };
   let target = ORB.intro;
   let riseT = 0;
 
@@ -382,8 +386,9 @@ textarea::placeholder{color:var(--muted)}
     const k = 1 - Math.pow(.0016, dt/1000); // weiche Annäherung
 
     for (const key of ['x','y','r','a','flick','twin']) cur[key] = lerp(cur[key], target[key], k);
+    cur.flies = lerp(cur.flies, target.flies ?? 1, k*.5);
     for (let i=0;i<3;i++) cur.hue[i] = lerp(cur.hue[i], target.hue[i], k);
-    if (target.rise) riseT = Math.min(1, riseT + dt/9000); else riseT = Math.max(0, riseT - dt/1500);
+    if (target.rise) riseT = Math.min(1, riseT + dt/14000); else riseT = Math.max(0, riseT - dt/1500);
 
     // Hintergrund
     const g = cx.createLinearGradient(0,0,0,H);
@@ -420,7 +425,7 @@ textarea::placeholder{color:var(--muted)}
       if (!reduce){ f.x += f.vx*dt + Math.sin(t+f.p)*.00008*dt; f.y += f.vy*dt; }
       if (f.y < -.05){ f.y = 1.05; f.x = Math.random(); }
       if (f.x < -.05) f.x = 1.05; if (f.x > 1.05) f.x = -.05;
-      const a = (.35+.65*Math.max(0,Math.sin(t*1.6+f.p))) * .55;
+      const a = (.35+.65*Math.max(0,Math.sin(t*1.6+f.p))) * .55 * cur.flies;
       const fx = f.x*W, fy = f.y*H, rr = f.s*5;
       const fg = cx.createRadialGradient(fx,fy,0,fx,fy,rr);
       fg.addColorStop(0,`rgba(${r},${gg},${b},${a})`); fg.addColorStop(1,`rgba(${r},${gg},${b},0)`);
@@ -455,7 +460,7 @@ textarea::placeholder{color:var(--muted)}
   function burst(){
     if (reduce) return;
     const ox = cur.x*W, oy = cur.y*H;
-    const cols = ['247,160,160','255,214,180','255,179,122','255,240,225'];
+    const cols = ['240,196,130','255,214,170','255,179,122','255,240,225'];
     for (let i=0;i<90;i++){
       const ang = Math.random()*Math.PI*2, sp = .05+Math.random()*.28;
       bloomBurst.push({ x:ox, y:oy, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-.05,
@@ -549,7 +554,7 @@ textarea::placeholder{color:var(--muted)}
       const r = send.getBoundingClientRect();
       if (r.bottom > innerHeight - 20) active.scrollBy({ top: r.bottom - innerHeight + 90, behavior: reduce ? 'auto' : 'smooth' });
     }, 650);
-    target = { ...ORB.ask, hue: { liebe:[247,160,160], zeit:[236,201,140], loslassen:[169,192,222] }[picked], a:.7, r:.10 };
+    target = { ...ORB.ask, hue: { warten:[240,196,130], vergessen:[150,172,205] }[picked], a:.7, r:.10 };
     if (navigator.vibrate) navigator.vibrate(8);
   });
 
@@ -567,8 +572,8 @@ textarea::placeholder{color:var(--muted)}
       msg.blur();
       progress.classList.remove('show');
       show(ends[picked]);
-      if (picked === 'liebe') setTimeout(burst, 700);
-      if (navigator.vibrate) navigator.vibrate(picked === 'liebe' ? [10,60,10] : 10);
+      if (picked === 'warten') setTimeout(burst, 700);
+      if (navigator.vibrate) navigator.vibrate(picked === 'warten' ? [10,60,10] : 10);
     } catch {
       err.textContent = 'Das hat nicht geklappt. Prüf kurz die Verbindung und versuch es nochmal.';
       send.disabled = false; send.textContent = 'Abschicken';

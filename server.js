@@ -26,6 +26,12 @@ const pool = new Pool({
 });
 
 const CHOICES = {
+  warten: 'Ja, warte auf mich',
+  vergessen: 'Vergiss deine Gefühle für mich',
+};
+// Bezeichnungen alter Antworten (erste Version), nur fürs Dashboard
+const LABELS = {
+  ...CHOICES,
   liebe: 'Ich fühle auch etwas für dich',
   zeit: 'Ich brauche Zeit',
   loslassen: 'Lass bitte los',
@@ -42,10 +48,13 @@ async function migrate() {
     CREATE TABLE IF NOT EXISTS answers (
       id          BIGSERIAL PRIMARY KEY,
       session_id  TEXT NOT NULL,
-      choice      TEXT NOT NULL CHECK (choice IN ('liebe','zeit','loslassen')),
+      choice      TEXT NOT NULL,
       message     TEXT,
       created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
     );
+    ALTER TABLE answers DROP CONSTRAINT IF EXISTS answers_choice_check;
+    ALTER TABLE answers ADD CONSTRAINT answers_choice_check
+      CHECK (choice IN ('warten','vergessen','liebe','zeit','loslassen'));
     CREATE INDEX IF NOT EXISTS answers_created_idx ON answers (created_at DESC);
     CREATE INDEX IF NOT EXISTS visits_opened_idx ON visits (opened_at DESC);
   `);
@@ -159,7 +168,7 @@ app.get('/alexander', rateLimit(60, 15 * 60 * 1000), requireAdmin, async (req, r
     const latestHtml = latest
       ? `<section class="hero c-${esc(latest.choice)}">
            <p class="kicker">Ihre Antwort · ${esc(fmt(latest.created_at))}</p>
-           <h1>${esc(CHOICES[latest.choice])}</h1>
+           <h1>${esc(LABELS[latest.choice])}</h1>
            ${latest.message ? `<blockquote>${esc(latest.message).replace(/\n/g, '<br>')}</blockquote>` : '<p class="muted">Keine Nachricht dazu geschrieben.</p>'}
          </section>`
       : `<section class="hero empty">
@@ -170,7 +179,7 @@ app.get('/alexander', rateLimit(60, 15 * 60 * 1000), requireAdmin, async (req, r
 
     const older = answers.rows.slice(1).map((a) => `
       <li><span class="dot c-${esc(a.choice)}"></span>
-        <div><strong>${esc(CHOICES[a.choice])}</strong><small>${esc(fmt(a.created_at))}</small>
+        <div><strong>${esc(LABELS[a.choice])}</strong><small>${esc(fmt(a.created_at))}</small>
         ${a.message ? `<p>${esc(a.message)}</p>` : ''}</div></li>`).join('');
 
     const visitList = visits.rows.map((v) => `<li>${esc(fmt(v.opened_at))}</li>`).join('');
@@ -188,12 +197,12 @@ main{max-width:560px;margin:0 auto}
 .hero{background:var(--card);border-radius:20px;padding:28px 22px;border:1px solid #2c2228}
 .kicker{font:600 12px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
 h1{font-size:28px;line-height:1.2;margin:0 0 16px;font-weight:400}
-.c-liebe h1{color:var(--rose)}.c-zeit h1{color:var(--gold)}.c-loslassen h1{color:var(--sky)}
+.c-liebe h1{color:var(--rose)}.c-zeit h1,.c-warten h1{color:var(--gold)}.c-loslassen h1,.c-vergessen h1{color:var(--sky)}
 blockquote{margin:0;padding:14px 16px;border-left:2px solid var(--rose);background:#251c21;border-radius:0 12px 12px 0;font-style:italic}
 .muted{color:var(--muted)}h2{font:600 12px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:36px 0 12px}
 ul{list-style:none;margin:0;padding:0}li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #2a2126}
 li small{display:block;color:var(--muted);font:13px system-ui,sans-serif}li p{margin:6px 0 0}
-.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}.dot.c-liebe{background:var(--rose)}.dot.c-zeit{background:var(--gold)}.dot.c-loslassen{background:var(--sky)}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}.dot.c-liebe{background:var(--rose)}.dot.c-zeit,.dot.c-warten{background:var(--gold)}.dot.c-loslassen,.dot.c-vergessen{background:var(--sky)}
 .visits li{display:block;font:14px system-ui,sans-serif;color:var(--muted)}
 </style></head><body><main>
 ${latestHtml}
