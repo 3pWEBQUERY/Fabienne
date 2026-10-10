@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e0a0f">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Für Fabienne</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23fff1dc'/%3E%3Cstop offset='.35' stop-color='%23ffb37a'/%3E%3Cstop offset='1' stop-color='%23ffb37a' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230e0a0f'/%3E%3Ccircle cx='32' cy='32' r='22' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0e0a0f;
+  --night-2:#1a1219;
+  --ink:#f6ece6;
+  --ink-soft:#cdbcb8;
+  --muted:#8f7c80;
+  --ember:#ffb37a;
+  --rose:#f0a3a6;
+  --gold:#ecc98c;
+  --sky:#a9c0de;
+  --line:rgba(246,236,230,.12);
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'Manrope',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.22,.7,.18,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--night);overscroll-behavior:none}
+body{
+  color:var(--ink);font-family:var(--serif);font-weight:300;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+  overflow:hidden;
+}
+#sky{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
+
+#stage{position:fixed;inset:0;z-index:2;height:100dvh;
+  padding:calc(env(safe-area-inset-top) + 56px) 28px calc(env(safe-area-inset-bottom) + 72px);
+  user-select:none;-webkit-user-select:none;touch-action:manipulation}
+
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:inherit;opacity:0;visibility:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  transition:opacity .9s var(--ease),visibility 0s linear .9s}
+.scene::-webkit-scrollbar{display:none}
+.scene.on{opacity:1;visibility:visible;transition:opacity .9s var(--ease),visibility 0s}
+.scene .inner{max-width:30rem;width:100%;margin:auto auto 0}
+.scene.center{text-align:center}
+.scene.center .inner{margin:auto;display:flex;flex-direction:column;align-items:center}
+
+.chapter{font:600 11px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--ember);margin-bottom:22px}
+h1{font-size:clamp(44px,13vw,68px);line-height:1;font-weight:300;letter-spacing:-.02em}
+h1 em{font-style:italic;color:var(--ember)}
+h2{font-size:clamp(30px,8.4vw,40px);line-height:1.12;font-weight:300;letter-spacing:-.01em;margin-bottom:20px}
+h2 em{font-style:italic}
+p.t{font-size:clamp(19px,5.1vw,22px);line-height:1.5;color:var(--ink-soft);margin-bottom:16px;font-variation-settings:'opsz' 24}
+p.t strong{font-weight:400;color:var(--ink)}
+.small{font:500 13px/1.55 var(--sans);color:var(--muted)}
+
+.line{opacity:0;transform:translateY(14px);filter:blur(6px);
+  transition:opacity 1.1s var(--ease),transform 1.1s var(--ease),filter 1.1s var(--ease);
+  transition-delay:calc(var(--i,0) * 420ms + 250ms)}
+.scene.on .line{opacity:1;transform:none;filter:blur(0)}
+
+.hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 26px);z-index:3;text-align:center;
+  font:500 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  opacity:0;transition:opacity .8s var(--ease);pointer-events:none}
+.hint.show{opacity:.8;animation:breathe 2.6s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.35}}
+
+.progress{position:fixed;top:calc(env(safe-area-inset-top) + 20px);left:28px;right:28px;z-index:3;display:flex;gap:6px;
+  opacity:0;transition:opacity .8s}
+.progress.show{opacity:1}
+.progress i{flex:1;height:2px;border-radius:2px;background:var(--line);overflow:hidden;position:relative}
+.progress i::after{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .9s var(--ease)}
+.progress i.done::after{transform:scaleX(1)}
+
+/* Start */
+.btn{appearance:none;border:1px solid rgba(255,179,122,.45);background:rgba(255,179,122,.08);color:var(--ink);
+  font:600 14px/1 var(--sans);letter-spacing:.08em;padding:18px 30px;border-radius:999px;cursor:pointer;
+  transition:background .3s,transform .2s;min-height:52px}
+.btn:active{transform:scale(.97);background:rgba(255,179,122,.18)}
+.privacy{display:flex;gap:10px;align-items:flex-start;text-align:left;margin-top:34px;max-width:21rem;
+  padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(14,10,15,.5);backdrop-filter:blur(6px)}
+.privacy svg{flex:none;margin-top:2px}
+
+/* Karte */
+.map{width:100%;max-width:340px;margin:0 auto 18px;display:block;overflow:visible}
+.map .route{fill:none;stroke:var(--ember);stroke-width:2;stroke-linecap:round;stroke-dasharray:900;stroke-dashoffset:900;
+  filter:drop-shadow(0 0 6px rgba(255,179,122,.6))}
+.scene.on .map .route{transition:stroke-dashoffset 4.2s var(--ease) .8s;stroke-dashoffset:0}
+.map .rhein{fill:none;stroke:var(--sky);stroke-width:1;opacity:.35;stroke-dasharray:3 5}
+.map .see{fill:var(--sky);opacity:.08}
+.map .pt{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.3)}
+.scene.on .map .pt{opacity:1;transform:none;transition:opacity .7s,transform .9s cubic-bezier(.3,1.6,.5,1)}
+.scene.on .map .p1{transition-delay:1.0s}.scene.on .map .p2{transition-delay:2.4s}.scene.on .map .p3{transition-delay:3.8s}
+.map text{font:600 10px var(--sans);letter-spacing:.16em;text-transform:uppercase;fill:var(--ink)}
+.map .lbl-r{font:italic 300 11px var(--serif);letter-spacing:0;text-transform:none;fill:var(--sky);opacity:.6}
+.map .halo{fill:var(--ember);opacity:.25;animation:pulse 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{transform:scale(1.8);opacity:0}}
+
+/* Wahl */
+.choices{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.choice{appearance:none;text-align:left;width:100%;cursor:pointer;color:var(--ink);
+  background:rgba(26,18,25,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:18px;padding:18px 18px 18px 52px;position:relative;
+  font:300 19px/1.35 var(--serif);transition:border-color .35s,background .35s,transform .2s;min-height:64px}
+.choice small{display:block;font:500 12px/1.4 var(--sans);color:var(--muted);margin-top:4px}
+.choice::before{content:"";position:absolute;left:20px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
+  border:1.5px solid var(--muted);transition:all .35s var(--ease)}
+.choice[data-c=liebe]{--c:var(--rose)}.choice[data-c=zeit]{--c:var(--gold)}.choice[data-c=loslassen]{--c:var(--sky)}
+.choice:active{transform:scale(.985)}
+.choice.sel{border-color:var(--c);background:rgba(40,28,36,.85)}
+.choice.sel::before{border-color:var(--c);background:var(--c);box-shadow:0 0 14px var(--c)}
+.choices.picked .choice:not(.sel){opacity:.45}
+
+.note{max-height:0;overflow:hidden;opacity:0;transition:max-height .8s var(--ease),opacity .6s .15s}
+.note.open{max-height:360px;opacity:1}
+.note label{display:block;margin:22px 0 10px}
+textarea{width:100%;min-height:96px;resize:none;border-radius:16px;border:1px solid var(--line);background:rgba(14,10,15,.65);
+  color:var(--ink);font:300 17px/1.45 var(--serif);padding:14px 16px;outline:none;transition:border-color .3s;user-select:text;-webkit-user-select:text}
+textarea:focus{border-color:rgba(255,179,122,.5)}
+textarea::placeholder{color:var(--muted)}
+.send{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+.send .btn{padding:16px 26px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.err{color:var(--rose);margin-top:10px;min-height:1.2em}
+
+/* Ende */
+.end h2{margin-bottom:22px}
+.end .sig{font-style:italic;color:var(--ember);font-size:22px;margin-top:10px}
+.end[data-c=liebe] .sig{color:var(--rose)}.end[data-c=zeit] .sig{color:var(--gold)}.end[data-c=loslassen] .sig{color:var(--sky)}
+
+@media (min-width:720px){
+  #stage{padding-left:0;padding-right:0}
+  .scene{padding:12vh 28px}
+}
+@media (max-height:640px){
+  .map{max-width:250px;margin-bottom:8px}
+  p.t{font-size:18px;margin-bottom:12px}
+  h2{margin-bottom:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  .line,.scene,.map .route,.map .pt{transition-duration:.01ms!important;transition-delay:0s!important}
+  .grain,.hint.show,.map .halo{animation:none}
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<main id="stage">
+
+  <!-- 0 Start -->
+  <section class="scene center on" data-orb="intro" data-notap>
+    <div class="inner">
+      <p class="chapter line" style="--i:0">Eine kurze Geschichte</p>
+      <h1 class="line" style="--i:1">Für<br><em>Fabienne</em></h1>
+      <p class="t line" style="--i:2;margin-top:24px">Nimm dir fünf Minuten. Tippe, um weiterzulesen.</p>
+      <div class="line" style="--i:3;margin-top:18px"><button class="btn" id="start" type="button">Beginnen</button></div>
+      <div class="privacy line" style="--i:4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffb37a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <p class="small">Am Ende darfst du etwas auswählen. Deine Antwort sieht nur Alexander, niemand sonst.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 Vorher -->
+  <section class="scene" data-orb="dim">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">I · Vorher</p>
+      <h2 class="line" style="--i:1">Nach der Diagnose habe ich gelernt zu <em>kämpfen</em>.</h2>
+      <p class="t line" style="--i:2">Aus dem Rollstuhl heraus, Schritt für Schritt, zurück auf die eigenen Beine.</p>
+      <p class="t line" style="--i:3">Aber eins habe ich nicht zurückerwartet. Ich war sicher, die Krankheit hat in mir etwas abgestellt: <strong>das Gefühl für andere Menschen.</strong></p>
+    </div>
+  </section>
+
+  <!-- 2 Du -->
+  <section class="scene" data-orb="spark">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">II · Dann du</p>
+      <h2 class="line" style="--i:1">Eine Arbeitskollegin. Ganz normal, dachte ich.</h2>
+      <p class="t line" style="--i:2">Bis ich gemerkt habe, dass ich mich auf die Tage freue, an denen ich dich sehe.</p>
+      <p class="t line" style="--i:3">Da war es wieder. Das, was ich für verloren hielt. <strong>Du hast mir gezeigt, dass es noch da ist.</strong></p>
+    </div>
+  </section>
+
+  <!-- 3 Schwere Zeit -->
+  <section class="scene" data-orb="warm">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">III · Die schwere Zeit</p>
+      <h2 class="line" style="--i:1">Als es dir schlecht ging, wollte ich einfach <em>da sein.</em></h2>
+      <p class="t line" style="--i:2">Am Telefon. Im Videochat bis spät in die Nacht. Beim Shoppen, wenn du raus musstest.</p>
+      <p class="t line" style="--i:3">Ich habe nie etwas dafür erwartet. Aber in diesen Wochen ist aus Mögen <strong>etwas viel Grösseres</strong> geworden.</p>
+    </div>
+  </section>
+
+  <!-- 4 Orte -->
+  <section class="scene" data-orb="high">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">IV · Unsere Wege</p>
+      <svg class="map" viewBox="0 0 300 330" role="img" aria-label="Eine Linie verbindet Bülach, Singen und Konstanz">
+        <ellipse class="see" cx="292" cy="150" rx="46" ry="26" transform="rotate(-22 292 150)"/>
+        <path class="rhein" d="M4 214 C 70 196 130 206 186 186 S 246 166 262 160"/>
+        <text class="lbl-r" x="40" y="226">Rhein</text>
+        <path class="route" d="M60 277 C 72 196 104 118 147 97 C 196 74 236 120 245 168 C 256 238 160 298 60 277"/>
+        <g class="pt p1"><circle class="halo" cx="60" cy="277" r="7"/><circle cx="60" cy="277" r="4.5" fill="#ffb37a"/><text x="50" y="300" text-anchor="end">Bülach</text></g>
+        <g class="pt p2"><circle class="halo" cx="147" cy="97" r="7"/><circle cx="147" cy="97" r="4.5" fill="#ffb37a"/><text x="160" y="93">Singen</text></g>
+        <g class="pt p3"><circle class="halo" cx="245" cy="168" r="7"/><circle cx="245" cy="168" r="4.5" fill="#ffb37a"/><text x="236" y="148" text-anchor="end">Konstanz</text></g>
+      </svg>
+      <p class="t line" style="--i:7">Für dich vielleicht einfach Shoppingtage.</p>
+      <p class="t line" style="--i:8"><strong>Für mich die Tage, die ich am längsten behalte.</strong></p>
+    </div>
+  </section>
+
+  <!-- 5 Aliyah -->
+  <section class="scene" data-orb="twin">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">V · Aliyah</p>
+      <h2 class="line" style="--i:1">Und dann ist da noch <em>Aliyah.</em></h2>
+      <p class="t line" style="--i:2">Ich habe sie vom ersten Moment an ins Herz geschlossen. Ihr Lachen, ihre Neugier, wie sie die Welt anschaut.</p>
+      <p class="t line" style="--i:3"><strong>Sie gehört für mich genauso dazu wie du.</strong></p>
+    </div>
+  </section>
+
+  <!-- 6 Ehrlich -->
+  <section class="scene" data-orb="steady">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">VI · Ehrlich</p>
+      <h2 class="line" style="--i:1">Ich weiss, dass du einen Freund hast.</h2>
+      <p class="t line" style="--i:2">Ich will nichts kaputt machen und dich zu nichts drängen.</p>
+      <p class="t line" style="--i:3">Aber seit Monaten weiss ich nicht, woran ich bin. Ich habe versucht, Abstand zu nehmen, und es nicht geschafft. <strong>Raten tut mir nicht mehr gut.</strong></p>
+      <p class="t line" style="--i:4">Darum frage ich dich. Einmal, ganz ehrlich.</p>
+    </div>
+  </section>
+
+  <!-- 7 Wahl -->
+  <section class="scene" data-orb="ask" data-notap id="ask">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">VII · Deine Antwort</p>
+      <h2 class="line" style="--i:1">Was empfindest du für mich?</h2>
+      <div class="choices line" style="--i:2" id="choices" role="radiogroup" aria-label="Deine Antwort">
+        <button class="choice" type="button" role="radio" aria-checked="false" data-c="liebe">Ich fühle auch etwas für dich.<small>Mehr als Freundschaft</small></button>
+        <button class="choice" type="button" role="radio" aria-checked="false" data-c="zeit">Ich bin unsicher.<small>Ich brauche Zeit</small></button>
+        <button class="choice" type="button" role="radio" aria-checked="false" data-c="loslassen">Ich mag dich, aber nicht so.<small>Bitte lass los</small></button>
+      </div>
+      <div class="note" id="note">
+        <label class="small" for="msg">Wenn du magst, schreib noch etwas dazu. Musst du nicht.</label>
+        <textarea id="msg" maxlength="2000" rows="3" placeholder="…"></textarea>
+        <div class="send">
+          <p class="small">Nur Alexander sieht das.</p>
+          <button class="btn" id="send" type="button">Abschicken</button>
+        </div>
+        <p class="small err" id="err" role="alert"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 Enden -->
+  <section class="scene end" data-orb="bloom" data-notap data-end="liebe" data-c="liebe">
+    <div class="inner">
+      <p class="chapter line" style="--i:0" >Danke</p>
+      <h2 class="line" style="--i:1">Wenn ich das lese, habe ich <em>Herzklopfen.</em></h2>
+      <p class="t line" style="--i:2">Danke, dass du es mir sagst. Ich weiss, dass es für dich nicht einfach ist, und ich will nichts überstürzen.</p>
+      <p class="t line" style="--i:3">Lass uns reden. In Ruhe, wenn es für dich passt.</p>
+      <p class="sig line" style="--i:4">Alexander</p>
+    </div>
+  </section>
+
+  <section class="scene end" data-orb="calm" data-notap data-end="zeit" data-c="zeit">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">Danke</p>
+      <h2 class="line" style="--i:1">Nimm dir die Zeit, die du <em>brauchst.</em></h2>
+      <p class="t line" style="--i:2">Danke, dass du ehrlich bist, auch wenn die Antwort noch offen ist. Das ist mehr als nichts.</p>
+      <p class="t line" style="--i:3">Ich dränge dich nicht. Wenn du so weit bist, weisst du, wo du mich findest.</p>
+      <p class="sig line" style="--i:4">Alexander</p>
+    </div>
+  </section>
+
+  <section class="scene end" data-orb="release" data-notap data-end="loslassen" data-c="loslassen">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">Danke</p>
+      <h2 class="line" style="--i:1">Ich lasse <em>los.</em></h2>
+      <p class="t line" style="--i:2">Danke, dass du ehrlich bist. Das ist mehr wert als jede Antwort, die ich mir gewünscht hätte.</p>
+      <p class="t line" style="--i:3">Ich lasse die Hoffnung gehen, nicht dich als Mensch. Und eins nehme ich mit: <strong>Du hast mir gezeigt, dass ich lieben kann.</strong></p>
+      <p class="sig line" style="--i:4">Alexander</p>
+    </div>
+  </section>
+
+</main>
+<div class="hint" id="hint">Tippen</div>
+
+<script>
+(() => {
+  'use strict';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Sitzung ---------- */
+  const store = {
+    get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+    set(k,v){ try { localStorage.setItem(k,v); } catch {} }
+  };
+  const uuid = () => (crypto.randomUUID ? crypto.randomUUID()
+    : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random()*16|0; return (c === 'x' ? r : (r&0x3|0x8)).toString(16); }));
+  let session = store.get('ff_session');
+  if (!session) { session = uuid(); store.set('ff_session', session); }
+
+  const post = (url, body) => fetch(url, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), keepalive:true
+  });
+  post('/api/visit', { session }).catch(() => {});
+
+  /* ---------- Himmel / Licht ---------- */
+  const cv = document.getElementById('sky');
+  const cx = cv.getContext('2d');
+  let W = 0, H = 0, DPR = 1;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W*DPR; cv.height = H*DPR;
+    cx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  resize(); addEventListener('resize', resize);
+
+  // Zielzustände des Lichts pro Szene
+  const ORB = {
+    intro:  { x:.5, y:.30, r:.10, a:.55, flick:.25, hue:[255,179,122], twin:0, rise:0 },
+    dim:    { x:.5, y:.26, r:.035,a:.22, flick:.6,  hue:[220,150,120], twin:0, rise:0 },
+    spark:  { x:.5, y:.26, r:.09, a:.70, flick:.35, hue:[255,179,122], twin:0, rise:0 },
+    warm:   { x:.5, y:.24, r:.15, a:.85, flick:.12, hue:[255,172,118], twin:0, rise:0 },
+    high:   { x:.82,y:.08, r:.08, a:.55, flick:.10, hue:[255,179,122], twin:0, rise:0 },
+    twin:   { x:.44,y:.22, r:.14, a:.85, flick:.10, hue:[255,179,122], twin:1, rise:0 },
+    steady: { x:.5, y:.20, r:.12, a:.70, flick:.05, hue:[255,186,140], twin:0, rise:0 },
+    ask:    { x:.5, y:.10, r:.08, a:.50, flick:.05, hue:[255,186,140], twin:0, rise:0 },
+    bloom:  { x:.5, y:.24, r:.42, a:1.0, flick:.04, hue:[247,160,160], twin:0, rise:0 },
+    calm:   { x:.5, y:.24, r:.17, a:.80, flick:0,   hue:[236,201,140], twin:0, rise:0 },
+    release:{ x:.5, y:.24, r:.10, a:.80, flick:0,   hue:[169,192,222], twin:0, rise:1 }
+  };
+  const cur = { ...ORB.intro, hue:[...ORB.intro.hue] };
+  let target = ORB.intro;
+  let riseT = 0;
+
+  const stars = Array.from({length: Math.round(Math.min(140, innerWidth*innerHeight/5000))}, () => ({
+    x:Math.random(), y:Math.random()*.75, s:Math.random()*1.1+.2, p:Math.random()*Math.PI*2, v:.3+Math.random()*.8
+  }));
+  const flies = Array.from({length: innerWidth < 500 ? 26 : 40}, () => ({
+    x:Math.random(), y:.35+Math.random()*.65, vx:(Math.random()-.5)*.00025, vy:-(Math.random()*.00025+.00005),
+    s:Math.random()*1.8+.6, p:Math.random()*Math.PI*2
+  }));
+  let bloomBurst = [];
+
+  const lerp = (a,b,t) => a+(b-a)*t;
+  let last = performance.now();
+
+  function frame(now){
+    const dt = Math.min(64, now-last); last = now;
+    const k = 1 - Math.pow(.0016, dt/1000); // weiche Annäherung
+
+    for (const key of ['x','y','r','a','flick','twin']) cur[key] = lerp(cur[key], target[key], k);
+    for (let i=0;i<3;i++) cur.hue[i] = lerp(cur.hue[i], target.hue[i], k);
+    if (target.rise) riseT = Math.min(1, riseT + dt/9000); else riseT = Math.max(0, riseT - dt/1500);
+
+    // Hintergrund
+    const g = cx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#0b080d'); g.addColorStop(.6,'#140e15'); g.addColorStop(1,'#1d1219');
+    cx.fillStyle = g; cx.fillRect(0,0,W,H);
+
+    const t = now/1000;
+    // Sterne
+    for (const s of stars){
+      const a = .25 + .35*Math.sin(t*s.v + s.p);
+      cx.fillStyle = `rgba(246,236,230,${Math.max(0,a)})`;
+      cx.fillRect(s.x*W, s.y*H, s.s, s.s);
+    }
+
+    const [r,gg,b] = cur.hue.map(Math.round);
+    const base = Math.min(W,H);
+    const flick = reduce ? 1 : 1 - cur.flick*(.5+.5*Math.sin(t*9.3)*Math.sin(t*3.7));
+    let ox = cur.x*W, oy = cur.y*H;
+    // Laterne steigt auf
+    const e = riseT*riseT*(3-2*riseT);
+    oy = lerp(oy, -base*.25, e); ox += Math.sin(t*.9)*12*e;
+    const alpha = cur.a*flick*(1-e*.85);
+    const rad = base*cur.r*(1 + (reduce?0:.04*Math.sin(t*1.4)));
+
+    drawOrb(ox, oy, rad, r, gg, b, alpha);
+    if (cur.twin > .01){
+      const tx = ox + base*.22, ty = oy + base*.10 + Math.sin(t*1.2)*6;
+      drawOrb(tx, ty, rad*.42, 255, 214, 170, alpha*cur.twin);
+    }
+
+    // Glühwürmchen
+    cx.globalCompositeOperation = 'lighter';
+    for (const f of flies){
+      if (!reduce){ f.x += f.vx*dt + Math.sin(t+f.p)*.00008*dt; f.y += f.vy*dt; }
+      if (f.y < -.05){ f.y = 1.05; f.x = Math.random(); }
+      if (f.x < -.05) f.x = 1.05; if (f.x > 1.05) f.x = -.05;
+      const a = (.35+.65*Math.max(0,Math.sin(t*1.6+f.p))) * .55;
+      const fx = f.x*W, fy = f.y*H, rr = f.s*5;
+      const fg = cx.createRadialGradient(fx,fy,0,fx,fy,rr);
+      fg.addColorStop(0,`rgba(${r},${gg},${b},${a})`); fg.addColorStop(1,`rgba(${r},${gg},${b},0)`);
+      cx.fillStyle = fg; cx.beginPath(); cx.arc(fx,fy,rr,0,Math.PI*2); cx.fill();
+    }
+    // Funken beim "Ja"
+    bloomBurst = bloomBurst.filter(p => (p.life -= dt) > 0);
+    for (const p of bloomBurst){
+      p.x += p.vx*dt; p.y += p.vy*dt; p.vy += .00002*dt; p.vx *= .995;
+      const a = Math.min(1, p.life/900);
+      cx.fillStyle = `rgba(${p.c},${a})`;
+      cx.beginPath(); cx.arc(p.x,p.y,p.s,0,Math.PI*2); cx.fill();
+    }
+    cx.globalCompositeOperation = 'source-over';
+
+    requestAnimationFrame(frame);
+  }
+  function drawOrb(x,y,rad,r,g,b,a){
+    if (a <= .005) return;
+    cx.globalCompositeOperation = 'lighter';
+    const outer = cx.createRadialGradient(x,y,0,x,y,rad*3.2);
+    outer.addColorStop(0,`rgba(${r},${g},${b},${.35*a})`);
+    outer.addColorStop(1,`rgba(${r},${g},${b},0)`);
+    cx.fillStyle = outer; cx.beginPath(); cx.arc(x,y,rad*3.2,0,Math.PI*2); cx.fill();
+    const core = cx.createRadialGradient(x,y,0,x,y,rad);
+    core.addColorStop(0,`rgba(255,246,232,${a})`);
+    core.addColorStop(.25,`rgba(${r},${g},${b},${.9*a})`);
+    core.addColorStop(1,`rgba(${r},${g},${b},0)`);
+    cx.fillStyle = core; cx.beginPath(); cx.arc(x,y,rad,0,Math.PI*2); cx.fill();
+    cx.globalCompositeOperation = 'source-over';
+  }
+  function burst(){
+    if (reduce) return;
+    const ox = cur.x*W, oy = cur.y*H;
+    const cols = ['247,160,160','255,214,180','255,179,122','255,240,225'];
+    for (let i=0;i<90;i++){
+      const ang = Math.random()*Math.PI*2, sp = .05+Math.random()*.28;
+      bloomBurst.push({ x:ox, y:oy, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-.05,
+        s:Math.random()*2+.6, life:1600+Math.random()*1800, c:cols[i%cols.length] });
+    }
+  }
+  requestAnimationFrame(frame);
+
+  /* ---------- Szenen ---------- */
+  const scenes = [...document.querySelectorAll('.scene')];
+  const story = scenes.filter(s => !s.dataset.end);       // Start … Wahl
+  const ends = Object.fromEntries(scenes.filter(s => s.dataset.end).map(s => [s.dataset.end, s]));
+  const hint = document.getElementById('hint');
+  const progress = document.getElementById('progress');
+  const steps = story.length - 1; // ohne Startseite
+  progress.innerHTML = '<i></i>'.repeat(steps);
+  const bars = [...progress.children];
+
+  let idx = 0, active = story[0], locked = false, hintTimer;
+
+  function show(scene){
+    if (scene === active) return;
+    active.classList.remove('on');
+    scene.classList.add('on');
+    active = scene;
+    target = ORB[scene.dataset.orb] || ORB.steady;
+    const i = story.indexOf(scene);
+    bars.forEach((b,n) => b.classList.toggle('done', i > 0 && n < i));
+    progress.classList.toggle('show', i > 0);
+    // "Tippen"-Hinweis erst, wenn der Text da ist
+    hint.classList.remove('show'); clearTimeout(hintTimer);
+    if (!scene.hasAttribute('data-notap')){
+      const lines = scene.querySelectorAll('.line').length;
+      hintTimer = setTimeout(() => hint.classList.add('show'), reduce ? 300 : lines*420 + 1600);
+    }
+    locked = true; setTimeout(() => locked = false, reduce ? 150 : 700);
+  }
+  function go(d){
+    if (locked) return;
+    const n = idx + d;
+    if (n < 0 || n >= story.length) return;
+    if (d > 0 && story[idx].hasAttribute('data-notap')) return;
+    idx = n; show(story[idx]);
+  }
+
+  document.getElementById('start').addEventListener('click', e => { e.stopPropagation(); idx = 1; show(story[1]); });
+
+  const stage = document.getElementById('stage');
+  stage.addEventListener('click', e => {
+    if (e.target.closest('button,textarea,label,a')) return;
+    if (!story.includes(active)) return;
+    // linker Rand = zurück, sonst weiter
+    if (e.clientX < innerWidth*.22) { if (idx > 1) go(-1); }
+    else go(1);
+  });
+  addEventListener('keydown', e => {
+    if (e.target.matches('textarea')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft' && idx > 1) go(-1);
+  });
+  // Wischen
+  let sx = null, sy = null;
+  stage.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+  stage.addEventListener('touchend', e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)*1.5 && story.includes(active)){
+      e.preventDefault();
+      if (dx < 0) go(1); else if (idx > 1) go(-1);
+    }
+  });
+
+  /* ---------- Wahl ---------- */
+  const choiceWrap = document.getElementById('choices');
+  const note = document.getElementById('note');
+  const msg = document.getElementById('msg');
+  const send = document.getElementById('send');
+  const err = document.getElementById('err');
+  let picked = null;
+
+  choiceWrap.addEventListener('click', e => {
+    const btn = e.target.closest('.choice'); if (!btn) return;
+    picked = btn.dataset.c;
+    choiceWrap.querySelectorAll('.choice').forEach(c => {
+      const on = c === btn; c.classList.toggle('sel', on); c.setAttribute('aria-checked', on);
+    });
+    choiceWrap.classList.add('picked');
+    const firstOpen = !note.classList.contains('open');
+    note.classList.add('open');
+    if (firstOpen) setTimeout(() => {
+      const r = send.getBoundingClientRect();
+      if (r.bottom > innerHeight - 20) active.scrollBy({ top: r.bottom - innerHeight + 90, behavior: reduce ? 'auto' : 'smooth' });
+    }, 650);
+    target = { ...ORB.ask, hue: { liebe:[247,160,160], zeit:[236,201,140], loslassen:[169,192,222] }[picked], a:.7, r:.10 };
+    if (navigator.vibrate) navigator.vibrate(8);
+  });
+
+  // Tastatur auf dem Handy: Textfeld sichtbar halten
+  msg.addEventListener('focus', () => setTimeout(() => msg.scrollIntoView({block:'center', behavior:'smooth'}), 320));
+
+  send.addEventListener('click', async () => {
+    if (!picked) return;
+    send.disabled = true; err.textContent = '';
+    send.textContent = 'Wird gesendet …';
+    try {
+      const res = await post('/api/answer', { session, choice: picked, message: msg.value });
+      if (!res.ok) throw new Error(res.status);
+      store.set('ff_answered', picked);
+      msg.blur();
+      progress.classList.remove('show');
+      show(ends[picked]);
+      if (picked === 'liebe') setTimeout(burst, 700);
+      if (navigator.vibrate) navigator.vibrate(picked === 'liebe' ? [10,60,10] : 10);
+    } catch {
+      err.textContent = 'Das hat nicht geklappt. Prüf kurz die Verbindung und versuch es nochmal.';
+      send.disabled = false; send.textContent = 'Abschicken';
+    }
+  });
+})();
+</script>
+</body>
+</html>
