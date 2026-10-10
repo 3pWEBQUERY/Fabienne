@@ -88,6 +88,7 @@ p.t strong{font-weight:400;color:var(--ink)}
   font:600 14px/1 var(--sans);letter-spacing:.08em;padding:18px 30px;border-radius:999px;cursor:pointer;
   transition:background .3s,transform .2s;min-height:52px}
 .btn:active{transform:scale(.97);background:rgba(255,179,122,.18)}
+.from{margin-top:30px;font:italic 300 18px/1.4 var(--serif);color:var(--ember);letter-spacing:.01em}
 .privacy{display:flex;gap:10px;align-items:flex-start;text-align:left;margin-top:34px;max-width:21rem;
   padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(14,10,15,.5);backdrop-filter:blur(6px)}
 .privacy svg{flex:none;margin-top:2px}
@@ -168,10 +169,7 @@ textarea::placeholder{color:var(--muted)}
       <h1 class="line" style="--i:1">Für<br><em>Fabienne</em></h1>
       <p class="t line" style="--i:2;margin-top:24px">Nimm dir fünf Minuten. Tippe, um weiterzulesen.</p>
       <div class="line" style="--i:3;margin-top:18px"><button class="btn" id="start" type="button">Beginnen</button></div>
-      <div class="privacy line" style="--i:4">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffb37a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        <p class="small">Am Ende darfst du etwas auswählen. Deine Antwort sieht nur Alexander, niemand sonst.</p>
-      </div>
+      <p class="from line" style="--i:4">Von Alexander für Fabienne</p>
     </div>
   </section>
 
@@ -262,10 +260,21 @@ textarea::placeholder{color:var(--muted)}
   <section class="scene" data-orb="glow">
     <div class="inner">
       <p class="chapter line" style="--i:0">VIII · Du</p>
-      <h2 class="line" style="--i:1">Was ich an dir so <em>liebe.</em></h2>
-      <p class="t line" style="--i:2">Dein Lächeln. Deine Art. Wie viel wir gemeinsam haben, oft mehr, als ich je gedacht hätte.</p>
-      <p class="t line" style="--i:3">Egal wie angespannt ich bin, du bringst mich wieder auf den Boden. Manchmal reicht ein Lächeln. Manchmal, dass ich dich streicheln darf.</p>
+      <h2 class="line" style="--i:1">Was ich für dich <em>fühle.</em></h2>
+      <p class="t line" style="--i:2">Mehr, als ich je für möglich gehalten hätte. Dein Lächeln, deine Art, wie viel wir gemeinsam haben.</p>
+      <p class="t line" style="--i:3">Und was du für mich tust, weisst du vielleicht gar nicht: Egal wie angespannt ich bin, <strong>du bringst mich wieder auf den Boden.</strong> Manchmal reicht ein Lächeln. Manchmal, dass ich dich streicheln darf.</p>
       <p class="t line" style="--i:4">Und deine Reaktion, wenn ich deinen Arm, deine Schultern oder deinen Rücken küsse: <strong>Die kann ich nicht beschreiben.</strong></p>
+    </div>
+  </section>
+
+  <!-- 8 Mein Kopf -->
+  <section class="scene" data-orb="mind">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">IX · Mein Kopf</p>
+      <h2 class="line" style="--i:1">Und dann ist da mein <em>Kopf.</em></h2>
+      <p class="t line" style="--i:2">Ich weiss, dass ich anstrengend sein kann. Ich denke zu viel nach, drehe Dinge hin und her und deute vielleicht vieles einfach falsch.</p>
+      <p class="t line" style="--i:3">Ich bin 34 und war trotzdem lange allein. Vieles, was für andere selbstverständlich ist, fällt mir schwer.</p>
+      <p class="t line" style="--i:4">Darum bin ich vielleicht nicht wie andere Männer. Aber das hat einen Grund: <strong>Ich will mit dir einfach nichts kaputt machen.</strong></p>
       <p class="t line" style="--i:5">Darum frage ich dich. Einmal, ganz ehrlich.</p>
     </div>
   </section>
@@ -273,7 +282,7 @@ textarea::placeholder{color:var(--muted)}
   <!-- 8 Frage -->
   <section class="scene" data-orb="ask" data-notap id="ask">
     <div class="inner">
-      <p class="chapter line" style="--i:0">IX · Deine Antwort</p>
+      <p class="chapter line" style="--i:0">X · Deine Antwort</p>
       <h2 class="line" style="--i:1">Lohnt es sich, auf dich zu <em>warten?</em></h2>
       <p class="t line" style="--i:2">Oder soll ich versuchen, meine Gefühle für dich zu vergessen?</p>
       <div class="choices line" style="--i:3" id="choices" role="radiogroup" aria-label="Deine Antwort">
@@ -362,6 +371,7 @@ textarea::placeholder{color:var(--muted)}
     steady: { x:.5, y:.20, r:.12, a:.70, flick:.05, hue:[255,186,140], twin:0, rise:0 },
     ask:    { x:.5, y:.10, r:.08, a:.50, flick:.05, hue:[255,186,140], twin:0, rise:0 },
     glow:   { x:.5, y:.09, r:.13, a:.95, flick:.03, hue:[255,180,150], twin:0, rise:0 },
+    mind:   { x:.5, y:.09, r:.07, a:.60, flick:.45, hue:[250,186,150], twin:0, rise:0 },
     wait:   { x:.5, y:.22, r:.26, a:.95, flick:.02, hue:[240,196,130], twin:0, rise:0 },
     release:{ x:.5, y:.22, r:.09, a:.70, flick:.08, hue:[150,172,205], twin:0, rise:1, flies:.25 }
   };
