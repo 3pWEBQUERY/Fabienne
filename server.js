@@ -216,7 +216,13 @@ app.get('/healthz', async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], maxAge: '1h' }));
+app.use(express.static(path.join(__dirname, 'public'), {
+  extensions: ['html'],
+  setHeaders: (res, file) => {
+    // HTML immer frisch, damit Änderungen sofort ankommen
+    if (file.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+  },
+}));
 app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'public', 'index.html')));
 
 migrate()
