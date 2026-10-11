@@ -25,13 +25,10 @@ const pool = new Pool({
   max: 5,
 });
 
-const CHOICES = {
+// Antworten aus früheren Versionen der Seite, nur noch fürs Dashboard
+const LABELS = {
   warten: 'Ja, warte auf mich',
   vergessen: 'Vergiss deine Gefühle für mich',
-};
-// Bezeichnungen alter Antworten (erste Version), nur fürs Dashboard
-const LABELS = {
-  ...CHOICES,
   liebe: 'Ich fühle auch etwas für dich',
   zeit: 'Ich brauche Zeit',
   loslassen: 'Lass bitte los',
@@ -57,6 +54,12 @@ async function migrate() {
       CHECK (choice IN ('warten','vergessen','liebe','zeit','loslassen'));
     CREATE INDEX IF NOT EXISTS answers_created_idx ON answers (created_at DESC);
     CREATE INDEX IF NOT EXISTS visits_opened_idx ON visits (opened_at DESC);
+    CREATE TABLE IF NOT EXISTS progress (
+      session_id  TEXT PRIMARY KEY,
+      max_step    INTEGER NOT NULL,
+      total       INTEGER NOT NULL,
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
   `);
 }
 
@@ -110,20 +113,26 @@ app.post('/api/visit', rateLimit(20, 60 * 60 * 1000), async (req, res) => {
   }
 });
 
-app.post('/api/answer', rateLimit(10, 60 * 60 * 1000), async (req, res) => {
-  const { session, choice, message } = req.body || {};
-  if (!isSession(session) || !Object.prototype.hasOwnProperty.call(CHOICES, choice)) {
+app.post('/api/progress', rateLimit(80, 60 * 60 * 1000), async (req, res) => {
+  const { session } = req.body || {};
+  const step = Number(req.body?.step);
+  const total = Number(req.body?.total);
+  if (!isSession(session) || !Number.isInteger(step) || !Number.isInteger(total) ||
+      total < 1 || total > 100 || step < 1 || step > total) {
     return res.status(400).json({ ok: false });
   }
-  const text = typeof message === 'string' ? message.trim().slice(0, 2000) : '';
   try {
     await pool.query(
-      'INSERT INTO answers (session_id, choice, message) VALUES ($1, $2, $3)',
-      [session, choice, text || null]
+      `INSERT INTO progress (session_id, max_step, total) VALUES ($1, $2, $3)
+       ON CONFLICT (session_id) DO UPDATE
+         SET max_step = GREATEST(progress.max_step, EXCLUDED.max_step),
+             total = EXCLUDED.total,
+             updated_at = now()`,
+      [session, step, total]
     );
     res.json({ ok: true });
   } catch (err) {
-    console.error('answer', err.message);
+    console.error('progress', err.message);
     res.status(500).json({ ok: false });
   }
 });
@@ -159,27 +168,34 @@ const fmt = (d) =>
 
 app.get('/alexander', rateLimit(60, 15 * 60 * 1000), requireAdmin, async (req, res) => {
   try {
-    const [answers, visits] = await Promise.all([
-      pool.query('SELECT choice, message, created_at FROM answers ORDER BY created_at DESC LIMIT 50'),
+    const [reads, visits, answers] = await Promise.all([
+      pool.query('SELECT max_step, total, updated_at FROM progress ORDER BY updated_at DESC LIMIT 50'),
       pool.query('SELECT opened_at FROM visits ORDER BY opened_at DESC LIMIT 50'),
+      pool.query('SELECT choice, message, created_at FROM answers ORDER BY created_at DESC LIMIT 50'),
     ]);
-    const latest = answers.rows[0];
+    const last = reads.rows[0];
+    const pct = (r) => Math.round((r.max_step / r.total) * 100);
+    const done = (r) => r.max_step >= r.total;
 
-    const latestHtml = latest
-      ? `<section class="hero c-${esc(latest.choice)}">
-           <p class="kicker">Ihre Antwort · ${esc(fmt(latest.created_at))}</p>
-           <h1>${esc(LABELS[latest.choice])}</h1>
-           ${latest.message ? `<blockquote>${esc(latest.message).replace(/\n/g, '<br>')}</blockquote>` : '<p class="muted">Keine Nachricht dazu geschrieben.</p>'}
+    const heroHtml = last
+      ? `<section class="hero ${done(last) ? 'done' : ''}">
+           <p class="kicker">Zuletzt gelesen · ${esc(fmt(last.updated_at))}</p>
+           <h1>${done(last) ? 'Bis zum Ende gelesen.' : `Bis Seite ${last.max_step} von ${last.total} gelesen.`}</h1>
+           <div class="bar"><i style="width:${pct(last)}%"></i></div>
+           <p class="muted">Diese Seite aktualisiert sich nicht von selbst. Lade neu, um den aktuellen Stand zu sehen.</p>
          </section>`
-      : `<section class="hero empty">
-           <p class="kicker">Noch keine Antwort</p>
-           <h1>${visits.rows.length ? 'Sie hat die Seite geöffnet.' : 'Die Seite wurde noch nicht geöffnet.'}</h1>
-           <p class="muted">Diese Seite aktualisiert sich nicht von selbst. Zieh nach unten oder lade neu.</p>
+      : `<section class="hero">
+           <p class="kicker">Noch nichts gelesen</p>
+           <h1>${visits.rows.length ? 'Die Seite wurde geöffnet, aber noch nicht begonnen.' : 'Die Seite wurde noch nicht geöffnet.'}</h1>
          </section>`;
 
-    const older = answers.rows.slice(1).map((a) => `
-      <li><span class="dot c-${esc(a.choice)}"></span>
-        <div><strong>${esc(LABELS[a.choice])}</strong><small>${esc(fmt(a.created_at))}</small>
+    const readList = reads.rows.slice(1).map((r) => `
+      <li><span class="dot ${done(r) ? 'on' : ''}"></span>
+        <div><strong>${done(r) ? 'Bis zum Ende' : `Seite ${r.max_step} von ${r.total}`}</strong><small>${esc(fmt(r.updated_at))}</small></div></li>`).join('');
+
+    const answerList = answers.rows.map((a) => `
+      <li><span class="dot"></span>
+        <div><strong>${esc(LABELS[a.choice] || a.choice)}</strong><small>${esc(fmt(a.created_at))}</small>
         ${a.message ? `<p>${esc(a.message)}</p>` : ''}</div></li>`).join('');
 
     const visitList = visits.rows.map((v) => `<li>${esc(fmt(v.opened_at))}</li>`).join('');
@@ -189,7 +205,7 @@ app.get('/alexander', rateLimit(60, 15 * 60 * 1000), requireAdmin, async (req, r
 <html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Antwort</title>
+<title>Gelesen</title>
 <style>
 :root{--bg:#120d10;--card:#1d161a;--ink:#f3e9e4;--muted:#a8979d;--rose:#e8a3a8;--gold:#e9c98f;--sky:#9fb7d6}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Iowan Old Style',serif;padding:max(24px,env(safe-area-inset-top)) 16px 48px}
@@ -197,18 +213,20 @@ main{max-width:560px;margin:0 auto}
 .hero{background:var(--card);border-radius:20px;padding:28px 22px;border:1px solid #2c2228}
 .kicker{font:600 12px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
 h1{font-size:28px;line-height:1.2;margin:0 0 16px;font-weight:400}
-.c-liebe h1{color:var(--rose)}.c-zeit h1,.c-warten h1{color:var(--gold)}.c-loslassen h1,.c-vergessen h1{color:var(--sky)}
-blockquote{margin:0;padding:14px 16px;border-left:2px solid var(--rose);background:#251c21;border-radius:0 12px 12px 0;font-style:italic}
+.done h1{color:var(--sky)}
+.bar{height:6px;border-radius:6px;background:#2c2228;overflow:hidden;margin:0 0 16px}.bar i{display:block;height:100%;background:var(--gold);border-radius:6px}
+.done .bar i{background:var(--sky)}
 .muted{color:var(--muted)}h2{font:600 12px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:36px 0 12px}
 ul{list-style:none;margin:0;padding:0}li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #2a2126}
 li small{display:block;color:var(--muted);font:13px system-ui,sans-serif}li p{margin:6px 0 0}
-.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}.dot.c-liebe{background:var(--rose)}.dot.c-zeit,.dot.c-warten{background:var(--gold)}.dot.c-loslassen,.dot.c-vergessen{background:var(--sky)}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none;background:var(--muted)}.dot.on{background:var(--sky)}
 .visits li{display:block;font:14px system-ui,sans-serif;color:var(--muted)}
 </style></head><body><main>
-${latestHtml}
-${older ? `<h2>Frühere Antworten</h2><ul>${older}</ul>` : ''}
+${heroHtml}
+${readList ? `<h2>Frühere Lesungen</h2><ul>${readList}</ul>` : ''}
 <h2>Geöffnet (${visits.rows.length})</h2>
 <ul class="visits">${visitList || '<li>Noch nie.</li>'}</ul>
+${answerList ? `<h2>Antworten aus der alten Version</h2><ul>${answerList}</ul>` : ''}
 </main></body></html>`);
   } catch (err) {
     console.error('dashboard', err.message);

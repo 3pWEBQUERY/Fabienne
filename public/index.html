@@ -108,43 +108,20 @@ p.t strong{font-weight:400;color:var(--ink)}
 .map .halo{fill:var(--ember);opacity:.25;animation:pulse 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes pulse{50%{transform:scale(1.8);opacity:0}}
 
-/* Wahl */
-.choices{display:flex;flex-direction:column;gap:12px;margin-top:8px}
-.choice{appearance:none;text-align:left;width:100%;cursor:pointer;color:var(--ink);
-  background:rgba(26,18,25,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid var(--line);border-radius:18px;padding:18px 18px 18px 52px;position:relative;
-  font:300 19px/1.35 var(--serif);transition:border-color .35s,background .35s,transform .2s;min-height:64px}
-.choice small{display:block;font:500 12px/1.4 var(--sans);color:var(--muted);margin-top:4px}
-.choice::before{content:"";position:absolute;left:20px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
-  border:1.5px solid var(--muted);transition:all .35s var(--ease)}
-.choice[data-c=warten]{--c:var(--gold)}.choice[data-c=vergessen]{--c:var(--sky)}
-.choice:active{transform:scale(.985)}
-.choice.sel{border-color:var(--c);background:rgba(40,28,36,.85)}
-.choice.sel::before{border-color:var(--c);background:var(--c);box-shadow:0 0 14px var(--c)}
-.choices.picked .choice:not(.sel){opacity:.45}
-
-.note{max-height:0;overflow:hidden;opacity:0;transition:max-height .8s var(--ease),opacity .6s .15s}
-.note.open{max-height:360px;opacity:1}
-.note label{display:block;margin:22px 0 10px}
-textarea{width:100%;min-height:96px;resize:none;border-radius:16px;border:1px solid var(--line);background:rgba(14,10,15,.65);
-  color:var(--ink);font:300 17px/1.45 var(--serif);padding:14px 16px;outline:none;transition:border-color .3s;user-select:text;-webkit-user-select:text}
-textarea:focus{border-color:rgba(255,179,122,.5)}
-textarea::placeholder{color:var(--muted)}
-.send{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
-.send .btn{padding:16px 26px}
-.btn[disabled]{opacity:.5;pointer-events:none}
-.err{color:var(--rose);margin-top:10px;min-height:1.2em}
+/* Dreimal Nein */
+.q{font-size:clamp(21px,5.8vw,25px);line-height:1.35;color:var(--ink-soft);margin-bottom:22px}
+.q .no{display:block;margin-top:4px;font-style:italic;font-size:clamp(28px,8vw,34px);color:var(--sky);letter-spacing:-.01em}
 
 /* Ende */
 .end h2{margin-bottom:22px}
-.end .sig{font-style:italic;color:var(--ember);font-size:22px;margin-top:10px}
-.end[data-c=warten] .sig{color:var(--gold)}.end[data-c=vergessen] .sig{color:var(--sky)}
+.end .sig{font-style:italic;color:var(--sky);font-size:22px;margin-top:14px}
 
 @media (min-width:720px){
   #stage{padding-left:0;padding-right:0}
   .scene{padding:12vh 28px}
 }
 @media (max-height:640px){
+  .q{font-size:19px;margin-bottom:14px}.q .no{font-size:26px}
   .map{max-width:250px;margin-bottom:8px}
   p.t{font-size:18px;margin-bottom:12px}
   h2{margin-bottom:14px}
@@ -167,7 +144,7 @@ textarea::placeholder{color:var(--muted)}
     <div class="inner">
       <p class="chapter line" style="--i:0">Eine kurze Geschichte</p>
       <h1 class="line" style="--i:1">Für<br><em>Fabienne</em></h1>
-      <p class="t line" style="--i:2;margin-top:24px">Nimm dir fünf Minuten. Tippe, um weiterzulesen.</p>
+      <p class="t line" style="--i:2;margin-top:24px">Nimm dir ein paar Minuten. Tippe, um weiterzulesen.</p>
       <div class="line" style="--i:3;margin-top:18px"><button class="btn" id="start" type="button">Beginnen</button></div>
       <p class="from line" style="--i:4">Von Alexander für Fabienne</p>
     </div>
@@ -275,51 +252,63 @@ textarea::placeholder{color:var(--muted)}
       <p class="t line" style="--i:2">Ich weiss, dass ich anstrengend sein kann. Ich denke zu viel nach, drehe Dinge hin und her und deute vielleicht vieles einfach falsch.</p>
       <p class="t line" style="--i:3">Ich bin 34 und war trotzdem lange allein. Vieles, was für andere selbstverständlich ist, fällt mir schwer.</p>
       <p class="t line" style="--i:4">Darum bin ich vielleicht nicht wie andere Männer. Aber das hat einen Grund: <strong>Ich will mit dir einfach nichts kaputt machen.</strong></p>
-      <p class="t line" style="--i:5">Darum frage ich dich. Einmal, ganz ehrlich.</p>
     </div>
   </section>
 
-  <!-- 8 Frage -->
-  <section class="scene" data-orb="ask" data-notap id="ask">
+  <!-- 9 Abschied -->
+  <section class="scene" data-orb="bye">
     <div class="inner">
-      <p class="chapter line" style="--i:0">X · Deine Antwort</p>
-      <h2 class="line" style="--i:1">Lohnt es sich, auf dich zu <em>warten?</em></h2>
-      <p class="t line" style="--i:2">Oder soll ich versuchen, meine Gefühle für dich zu vergessen?</p>
-      <div class="choices line" style="--i:3" id="choices" role="radiogroup" aria-label="Deine Antwort">
-        <button class="choice" type="button" role="radio" aria-checked="false" data-c="warten">Ja, warte auf mich.<small>Es lohnt sich</small></button>
-        <button class="choice" type="button" role="radio" aria-checked="false" data-c="vergessen">Nein, vergiss deine Gefühle für mich.<small>Lass los</small></button>
-      </div>
-      <div class="note" id="note">
-        <label class="small" for="msg">Wenn du magst, schreib noch etwas dazu. Musst du nicht.</label>
-        <textarea id="msg" maxlength="2000" rows="3" placeholder="…"></textarea>
-        <div class="send">
-          <p class="small">Nur Alexander sieht das.</p>
-          <button class="btn" id="send" type="button">Abschicken</button>
-        </div>
-        <p class="small err" id="err" role="alert"></p>
-      </div>
+      <p class="chapter line" style="--i:0">X · Abschied</p>
+      <h2 class="line" style="--i:1">Das hier fällt mir sehr <em>schwer.</em></h2>
+      <p class="t line" style="--i:2">Weil es mir diesmal ernst ist.</p>
+      <p class="t line" style="--i:3">Wie oft wollte ich mich schon von dir zurückziehen. Und konnte es nicht, weil da jedes Mal wieder diese eine Frage war: <strong>Was wäre, wenn?</strong></p>
+      <p class="t line" style="--i:4">Die nächsten vier Wochen will ich nutzen, um Abstand zu meinen Gefühlen zu finden und dich aus meinen Gedanken zu lassen.</p>
     </div>
   </section>
 
-  <!-- 9 Enden -->
-  <section class="scene end" data-orb="wait" data-notap data-end="warten" data-c="warten">
+  <section class="scene" data-orb="bye2">
     <div class="inner">
-      <p class="chapter line" style="--i:0">Danke</p>
-      <h2 class="line" style="--i:1">Dann <em>warte</em> ich.</h2>
-      <p class="t line" style="--i:2">Danke, dass du mir das sagst. Mehr brauche ich gerade nicht.</p>
-      <p class="t line" style="--i:3">Ich dränge dich nicht und ich zähle keine Tage. Ich bin da, so wie bisher, bis du so weit bist.</p>
+      <p class="chapter line" style="--i:0">X · Abschied</p>
+      <h2 class="line" style="--i:1">Nicht dich. Nur die <em>Gefühle.</em></h2>
+      <p class="t line" style="--i:2">Das heisst nicht, dass ich dich vergessen will.</p>
+      <p class="t line" style="--i:3">Ich will nur aufhören, mich in einen Wunschgedanken zu verrennen, von dem ich nie wissen werde, ob er jemals wahr wird.</p>
+    </div>
+  </section>
+
+  <section class="scene" data-orb="nein">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">X · Abschied</p>
+      <p class="q line" style="--i:1">Weiss ich, ob du Gefühle für mich hast?<span class="no line" style="--i:2">Nein.</span></p>
+      <p class="q line" style="--i:3">Weiss ich, was mit dir und mir in Zukunft passiert?<span class="no line" style="--i:4">Nein.</span></p>
+      <p class="q line" style="--i:5">Weiss ich, was du denkst, wenn du mit mir zusammen bist?<span class="no line" style="--i:6">Nein.</span></p>
+      <p class="t line" style="--i:8">Das Einzige, was ich weiss: Mein Kopf hat mir schon oft Streiche gespielt. <strong>Und mir das Leben schwerer gemacht, als es ohnehin schon ist.</strong></p>
+    </div>
+  </section>
+
+  <section class="scene" data-orb="miss">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">X · Abschied</p>
+      <h2 class="line" style="--i:1">Ich werde jede Minute mit dir <em>vermissen.</em></h2>
+      <p class="t line" style="--i:2">Das Lachen. Das Streicheln. Das Basteln für dich, von dem ich gehofft habe, es hilft dir durch die schwere Zeit. Auch wenn es dann einfach weggesperrt wurde.</p>
+      <p class="t line" style="--i:3"><strong>Danke für jeden dieser Momente.</strong> Und für jeden Gedanken, den ich durch dich habe.</p>
+    </div>
+  </section>
+
+  <section class="scene" data-orb="me">
+    <div class="inner">
+      <p class="chapter line" style="--i:0">X · Abschied</p>
+      <h2 class="line" style="--i:1">Jetzt bin ich wieder <em>dran.</em></h2>
+      <p class="t line" style="--i:2">Ich konzentriere mich wieder auf mich. Lasse meine Hobbys aufblühen. Mache unnütze Basteleien.</p>
+      <p class="t line" style="--i:3">Und Sachen wie diese Seite hier, die du vielleicht gerade anschaust.</p>
+    </div>
+  </section>
+
+  <section class="scene end" data-orb="release" data-notap>
+    <div class="inner">
+      <h2 class="line" style="--i:0">Ich wünsche dir und Aliyah nur das <em>Beste der Welt.</em></h2>
+      <p class="t line" style="--i:1">Auch wenn ich kein Teil davon bin.</p>
+      <p class="t line" style="--i:2">Wir sehen uns ja auf der Arbeit.</p>
       <p class="sig line" style="--i:4">Alexander</p>
-    </div>
-  </section>
-
-  <section class="scene end" data-orb="release" data-notap data-end="vergessen" data-c="vergessen">
-    <div class="inner">
-      <p class="chapter line" style="--i:0">Danke</p>
-      <h2 class="line" style="--i:1">Okay. Ich lasse <em>los.</em></h2>
-      <p class="t line" style="--i:2">Danke, dass du ehrlich bist. Es tut weh, aber es ist besser, als weiter zu raten.</p>
-      <p class="t line" style="--i:3">Diese Gefühle werde ich nicht von heute auf morgen vergessen können. Das braucht Zeit.</p>
-      <p class="t line" style="--i:4">Ich wünsche mir, dass wir die restliche Zeit trotzdem ganz normal miteinander umgehen können. <strong>Das Zusammensein mit dir werde ich vermissen.</strong></p>
-      <p class="sig line" style="--i:5">Alexander</p>
     </div>
   </section>
 
@@ -369,10 +358,13 @@ textarea::placeholder{color:var(--muted)}
     high:   { x:.82,y:.08, r:.08, a:.55, flick:.10, hue:[255,179,122], twin:0, rise:0 },
     twin:   { x:.44,y:.22, r:.14, a:.85, flick:.10, hue:[255,179,122], twin:1, rise:0 },
     steady: { x:.5, y:.20, r:.12, a:.70, flick:.05, hue:[255,186,140], twin:0, rise:0 },
-    ask:    { x:.5, y:.10, r:.08, a:.50, flick:.05, hue:[255,186,140], twin:0, rise:0 },
     glow:   { x:.5, y:.09, r:.13, a:.95, flick:.03, hue:[255,180,150], twin:0, rise:0 },
     mind:   { x:.5, y:.09, r:.07, a:.60, flick:.45, hue:[250,186,150], twin:0, rise:0 },
-    wait:   { x:.5, y:.22, r:.26, a:.95, flick:.02, hue:[240,196,130], twin:0, rise:0 },
+    bye:    { x:.5, y:.12, r:.10, a:.75, flick:.10, hue:[250,176,140], twin:0, rise:0 },
+    bye2:   { x:.5, y:.14, r:.08, a:.60, flick:.10, hue:[225,170,160], twin:0, rise:0 },
+    nein:   { x:.82,y:.08, r:.05, a:.45, flick:.35, hue:[160,178,210], twin:0, rise:0, flies:.5 },
+    miss:   { x:.5, y:.12, r:.12, a:.85, flick:.04, hue:[255,180,140], twin:0, rise:0 },
+    me:     { x:.5, y:.13, r:.10, a:.80, flick:.02, hue:[240,200,140], twin:0, rise:0 },
     release:{ x:.5, y:.22, r:.09, a:.70, flick:.08, hue:[150,172,205], twin:0, rise:1, flies:.25 }
   };
   const cur = { ...ORB.intro, hue:[...ORB.intro.hue], flies:1 };
@@ -386,7 +378,6 @@ textarea::placeholder{color:var(--muted)}
     x:Math.random(), y:.35+Math.random()*.65, vx:(Math.random()-.5)*.00025, vy:-(Math.random()*.00025+.00005),
     s:Math.random()*1.8+.6, p:Math.random()*Math.PI*2
   }));
-  let bloomBurst = [];
 
   const lerp = (a,b,t) => a+(b-a)*t;
   let last = performance.now();
@@ -441,14 +432,6 @@ textarea::placeholder{color:var(--muted)}
       fg.addColorStop(0,`rgba(${r},${gg},${b},${a})`); fg.addColorStop(1,`rgba(${r},${gg},${b},0)`);
       cx.fillStyle = fg; cx.beginPath(); cx.arc(fx,fy,rr,0,Math.PI*2); cx.fill();
     }
-    // Funken beim "Ja"
-    bloomBurst = bloomBurst.filter(p => (p.life -= dt) > 0);
-    for (const p of bloomBurst){
-      p.x += p.vx*dt; p.y += p.vy*dt; p.vy += .00002*dt; p.vx *= .995;
-      const a = Math.min(1, p.life/900);
-      cx.fillStyle = `rgba(${p.c},${a})`;
-      cx.beginPath(); cx.arc(p.x,p.y,p.s,0,Math.PI*2); cx.fill();
-    }
     cx.globalCompositeOperation = 'source-over';
 
     requestAnimationFrame(frame);
@@ -467,29 +450,18 @@ textarea::placeholder{color:var(--muted)}
     cx.fillStyle = core; cx.beginPath(); cx.arc(x,y,rad,0,Math.PI*2); cx.fill();
     cx.globalCompositeOperation = 'source-over';
   }
-  function burst(){
-    if (reduce) return;
-    const ox = cur.x*W, oy = cur.y*H;
-    const cols = ['240,196,130','255,214,170','255,179,122','255,240,225'];
-    for (let i=0;i<90;i++){
-      const ang = Math.random()*Math.PI*2, sp = .05+Math.random()*.28;
-      bloomBurst.push({ x:ox, y:oy, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-.05,
-        s:Math.random()*2+.6, life:1600+Math.random()*1800, c:cols[i%cols.length] });
-    }
-  }
   requestAnimationFrame(frame);
 
   /* ---------- Szenen ---------- */
   const scenes = [...document.querySelectorAll('.scene')];
-  const story = scenes.filter(s => !s.dataset.end);       // Start … Wahl
-  const ends = Object.fromEntries(scenes.filter(s => s.dataset.end).map(s => [s.dataset.end, s]));
+  const story = scenes;
   const hint = document.getElementById('hint');
   const progress = document.getElementById('progress');
   const steps = story.length - 1; // ohne Startseite
   progress.innerHTML = '<i></i>'.repeat(steps);
   const bars = [...progress.children];
 
-  let idx = 0, active = story[0], locked = false, hintTimer;
+  let idx = 0, active = story[0], locked = false, hintTimer, maxSeen = 0;
 
   function show(scene){
     if (scene === active) return;
@@ -500,6 +472,7 @@ textarea::placeholder{color:var(--muted)}
     const i = story.indexOf(scene);
     bars.forEach((b,n) => b.classList.toggle('done', i > 0 && n < i));
     progress.classList.toggle('show', i > 0);
+    if (i > maxSeen){ maxSeen = i; post('/api/progress', { session, step: i, total: steps }).catch(() => {}); }
     // "Tippen"-Hinweis erst, wenn der Text da ist
     hint.classList.remove('show'); clearTimeout(hintTimer);
     if (!scene.hasAttribute('data-notap')){
@@ -520,14 +493,12 @@ textarea::placeholder{color:var(--muted)}
 
   const stage = document.getElementById('stage');
   stage.addEventListener('click', e => {
-    if (e.target.closest('button,textarea,label,a')) return;
-    if (!story.includes(active)) return;
+    if (e.target.closest('button,a')) return;
     // linker Rand = zurück, sonst weiter
     if (e.clientX < innerWidth*.22) { if (idx > 1) go(-1); }
     else go(1);
   });
   addEventListener('keydown', e => {
-    if (e.target.matches('textarea')) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft' && idx > 1) go(-1);
   });
@@ -537,58 +508,12 @@ textarea::placeholder{color:var(--muted)}
   stage.addEventListener('touchend', e => {
     if (sx === null) return;
     const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)*1.5 && story.includes(active)){
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)*1.5){
       e.preventDefault();
       if (dx < 0) go(1); else if (idx > 1) go(-1);
     }
   });
 
-  /* ---------- Wahl ---------- */
-  const choiceWrap = document.getElementById('choices');
-  const note = document.getElementById('note');
-  const msg = document.getElementById('msg');
-  const send = document.getElementById('send');
-  const err = document.getElementById('err');
-  let picked = null;
-
-  choiceWrap.addEventListener('click', e => {
-    const btn = e.target.closest('.choice'); if (!btn) return;
-    picked = btn.dataset.c;
-    choiceWrap.querySelectorAll('.choice').forEach(c => {
-      const on = c === btn; c.classList.toggle('sel', on); c.setAttribute('aria-checked', on);
-    });
-    choiceWrap.classList.add('picked');
-    const firstOpen = !note.classList.contains('open');
-    note.classList.add('open');
-    if (firstOpen) setTimeout(() => {
-      const r = send.getBoundingClientRect();
-      if (r.bottom > innerHeight - 20) active.scrollBy({ top: r.bottom - innerHeight + 90, behavior: reduce ? 'auto' : 'smooth' });
-    }, 650);
-    target = { ...ORB.ask, hue: { warten:[240,196,130], vergessen:[150,172,205] }[picked], a:.7, r:.10 };
-    if (navigator.vibrate) navigator.vibrate(8);
-  });
-
-  // Tastatur auf dem Handy: Textfeld sichtbar halten
-  msg.addEventListener('focus', () => setTimeout(() => msg.scrollIntoView({block:'center', behavior:'smooth'}), 320));
-
-  send.addEventListener('click', async () => {
-    if (!picked) return;
-    send.disabled = true; err.textContent = '';
-    send.textContent = 'Wird gesendet …';
-    try {
-      const res = await post('/api/answer', { session, choice: picked, message: msg.value });
-      if (!res.ok) throw new Error(res.status);
-      store.set('ff_answered', picked);
-      msg.blur();
-      progress.classList.remove('show');
-      show(ends[picked]);
-      if (picked === 'warten') setTimeout(burst, 700);
-      if (navigator.vibrate) navigator.vibrate(picked === 'warten' ? [10,60,10] : 10);
-    } catch {
-      err.textContent = 'Das hat nicht geklappt. Prüf kurz die Verbindung und versuch es nochmal.';
-      send.disabled = false; send.textContent = 'Abschicken';
-    }
-  });
 })();
 </script>
 </body>
