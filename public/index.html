@@ -116,18 +116,31 @@ p.t strong{font-weight:400;color:var(--ink)}
 .end h2{margin-bottom:22px}
 .end .sig{font-style:italic;color:var(--sky);font-size:22px;margin-top:14px}
 
+/* Finale */
+#farewell{transition:transform 2.6s var(--ease),opacity 1.6s ease 1.5s,filter 1.6s ease 1.5s}
+#final.finale #farewell{transform:translateY(var(--dy,0)) scale(.94);opacity:0;filter:blur(8px)}
+.coda{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:calc(env(safe-area-inset-top) + 40px) 30px calc(env(safe-area-inset-bottom) + 40px);pointer-events:none}
+.cq{max-width:26rem;font:italic 300 clamp(20px,5.5vw,25px)/1.5 var(--serif);color:var(--ink-soft);font-variation-settings:'opsz' 30}
+.cl{display:block;margin-bottom:.85em;opacity:0;transform:translateY(12px);filter:blur(6px);
+  transition:opacity 1.8s var(--ease),transform 1.8s var(--ease),filter 1.8s var(--ease);
+  transition-delay:calc(3.4s + var(--k) * 2.6s)}
+.cl.last{color:var(--ink);margin-bottom:0}
+#final.finale .cl{opacity:1;transform:none;filter:none}
+
 @media (min-width:720px){
   #stage{padding-left:0;padding-right:0}
   .scene{padding:12vh 28px}
 }
 @media (max-height:640px){
+  .cq{font-size:19px}
   .q{font-size:19px;margin-bottom:14px}.q .no{font-size:26px}
   .map{max-width:250px;margin-bottom:8px}
   p.t{font-size:18px;margin-bottom:12px}
   h2{margin-bottom:14px}
 }
 @media (prefers-reduced-motion:reduce){
-  .line,.scene,.map .route,.map .pt{transition-duration:.01ms!important;transition-delay:0s!important}
+  .line,.scene,.map .route,.map .pt,#farewell,.cl{transition-duration:.01ms!important;transition-delay:0s!important}
   .grain,.hint.show,.map .halo{animation:none}
 }
 </style>
@@ -303,12 +316,20 @@ p.t strong{font-weight:400;color:var(--ink)}
     </div>
   </section>
 
-  <section class="scene end" data-orb="release" data-notap>
-    <div class="inner">
+  <section class="scene end" data-orb="release" data-notap id="final">
+    <div class="inner" id="farewell">
       <h2 class="line" style="--i:0">Ich wünsche dir und Aliyah nur das <em>Beste der Welt.</em></h2>
       <p class="t line" style="--i:1">Auch wenn ich kein Teil davon bin.</p>
       <p class="t line" style="--i:2">Wir sehen uns ja auf der Arbeit.</p>
       <p class="sig line" style="--i:4">Alexander</p>
+    </div>
+    <div class="coda" aria-live="polite">
+      <p class="cq">
+        <span class="cl" style="--k:0">„Manchmal wartet das Glück nicht dort, wo unser Herz es sucht.</span>
+        <span class="cl" style="--k:1">Und auch wenn wir uns wünschen, dass es ein bestimmter Mensch ist, bedeutet das nicht, dass wir es niemals finden werden.</span>
+        <span class="cl" style="--k:2">Vielleicht nicht mit ihm, vielleicht nicht heute –</span>
+        <span class="cl last" style="--k:3">aber eines Tages mit jemandem, bei dem wir nicht mehr daran zweifeln müssen, ob wir gewollt sind.“</span>
+      </p>
     </div>
   </section>
 
@@ -367,7 +388,7 @@ p.t strong{font-weight:400;color:var(--ink)}
     me:     { x:.5, y:.13, r:.10, a:.80, flick:.02, hue:[240,200,140], twin:0, rise:0 },
     release:{ x:.5, y:.22, r:.09, a:.70, flick:.08, hue:[150,172,205], twin:0, rise:1, flies:.25 }
   };
-  const cur = { ...ORB.intro, hue:[...ORB.intro.hue], flies:1 };
+  const cur = { ...ORB.intro, hue:[...ORB.intro.hue], flies:1, seed:0 };
   let target = ORB.intro;
   let riseT = 0;
 
@@ -388,6 +409,7 @@ p.t strong{font-weight:400;color:var(--ink)}
 
     for (const key of ['x','y','r','a','flick','twin']) cur[key] = lerp(cur[key], target[key], k);
     cur.flies = lerp(cur.flies, target.flies ?? 1, k*.5);
+    cur.seed = lerp(cur.seed, target.seed ?? 0, k*.35);
     for (let i=0;i<3;i++) cur.hue[i] = lerp(cur.hue[i], target.hue[i], k);
     if (target.rise) riseT = Math.min(1, riseT + dt/14000); else riseT = Math.max(0, riseT - dt/1500);
 
@@ -419,6 +441,13 @@ p.t strong{font-weight:400;color:var(--ink)}
       const tx = ox + base*.22, ty = oy + base*.10 + Math.sin(t*1.2)*6;
       drawOrb(tx, ty, rad*.42, 255, 214, 170, alpha*cur.twin);
     }
+
+    // Ein neues, kleines Licht ganz am Ende
+    if (cur.seed > .01){
+      const sa = cur.seed * (reduce ? 1 : .8 + .2*Math.sin(t*1.3));
+      drawOrb(W*.5, H*.12, base*.028, 255, 196, 150, sa);
+    }
+    if (finaleArmed && riseT >= 1) startFinale();
 
     // Glühwürmchen
     cx.globalCompositeOperation = 'lighter';
@@ -463,12 +492,32 @@ p.t strong{font-weight:400;color:var(--ink)}
 
   let idx = 0, active = story[0], locked = false, hintTimer, maxSeen = 0;
 
+  /* ---------- Finale ---------- */
+  const finalScene = document.getElementById('final');
+  const farewell = document.getElementById('farewell');
+  let finaleArmed = false, finaleTimer;
+  function startFinale(){
+    finaleArmed = false;
+    const r = farewell.getBoundingClientRect();
+    farewell.style.setProperty('--dy', `${Math.round(innerHeight/2 - (r.top + r.height/2))}px`);
+    finalScene.classList.add('finale');
+    progress.classList.remove('show');
+    clearTimeout(finaleTimer);
+    finaleTimer = setTimeout(() => { target = { ...ORB.release, seed: 1 }; }, reduce ? 0 : 3400 + 3*2600 + 2200);
+  }
+  function resetFinale(){
+    finaleArmed = false; clearTimeout(finaleTimer);
+    finalScene.classList.remove('finale');
+  }
+
   function show(scene){
     if (scene === active) return;
+    if (active === finalScene) resetFinale();
     active.classList.remove('on');
     scene.classList.add('on');
     active = scene;
     target = ORB[scene.dataset.orb] || ORB.steady;
+    if (scene === finalScene) finaleArmed = true;
     const i = story.indexOf(scene);
     bars.forEach((b,n) => b.classList.toggle('done', i > 0 && n < i));
     progress.classList.toggle('show', i > 0);
